@@ -1,28 +1,34 @@
 <?php
+session_start();
 include 'db_connection.php';
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $title = $_POST['title'];
-    $description = $_POST['description'];
-    $start_time = $_POST['start_time'];
-    $end_time = $_POST['end_time'];
-    $location = $_POST['location'];
-    $organizer_id = 1; // Placeholder for session user ID
+include 'navbar.php';
 
-    $sql = "INSERT INTO events (title, description, start_time, end_time, location, organizer_id) 
-            VALUES (:title, :description, :start_time, :end_time, :location, :organizer_id)";
+// Check if the user is logged in
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $name = $_POST['name'];
+    $date = $_POST['date'];
+    $location = $_POST['location'];
+    $description = $_POST['description']; // New field
+    $organizer_id = $_SESSION['user_id'];
+
+    $sql = "INSERT INTO events (name, date, location, description, organizer_id) VALUES (:name, :date, :location, :description, :organizer_id)";
     $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':title', $title);
-    $stmt->bindParam(':description', $description);
-    $stmt->bindParam(':start_time', $start_time);
-    $stmt->bindParam(':end_time', $end_time);
+    $stmt->bindParam(':name', $name);
+    $stmt->bindParam(':date', $date);
     $stmt->bindParam(':location', $location);
+    $stmt->bindParam(':description', $description); // New field
     $stmt->bindParam(':organizer_id', $organizer_id);
 
     if ($stmt->execute()) {
-        header("Location: index.php");
+        header("Location: events.php");
         exit();
     } else {
-        echo "Error: " . $stmt->errorInfo()[2];
+        echo "Error creating the event.";
     }
 }
 ?>
@@ -35,30 +41,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <title>Create Event</title>
 </head>
 <body>
-<div class="container mt-4">
-    <h1>Create Event</h1>
+<div class="container mt-5">
+    <h1>Create New Event</h1>
     <form method="POST">
         <div class="mb-3">
-            <label for="title" class="form-label">Event Title</label>
-            <input type="text" name="title" id="title" class="form-control" required>
+            <label for="name" class="form-label">Event Name</label>
+            <input type="text" name="name" id="name" class="form-control" required>
         </div>
         <div class="mb-3">
-            <label for="description" class="form-label">Description</label>
-            <textarea name="description" id="description" class="form-control" required></textarea>
-        </div>
-        <div class="mb-3">
-            <label for="start_time" class="form-label">Start Time</label>
-            <input type="datetime-local" name="start_time" id="start_time" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label for="end_time" class="form-label">End Time</label>
-            <input type="datetime-local" name="end_time" id="end_time" class="form-control" required>
+            <label for="date" class="form-label">Date</label>
+            <input type="date" name="date" id="date" class="form-control" required>
         </div>
         <div class="mb-3">
             <label for="location" class="form-label">Location</label>
             <input type="text" name="location" id="location" class="form-control" required>
         </div>
-        <button type="submit" class="btn btn-success">Create Event</button>
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea name="description" id="description" class="form-control" rows="4" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Event</button>
+        <a href="events.php" class="btn btn-secondary">Cancel</a>
     </form>
 </div>
 </body>

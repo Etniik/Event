@@ -4,7 +4,7 @@ include 'db_connection.php';
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $name = $_POST['name'];
     $email = $_POST['email'];
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
 
     $sql = "INSERT INTO users (name, email, password) VALUES (:name, :email, :password)";
     $stmt = $conn->prepare($sql);
@@ -13,16 +13,43 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->bindParam(':password', $password);
 
     if ($stmt->execute()) {
-        echo "User registered successfully.";
+        header("Location: login.php");
+        exit();
     } else {
-        echo "Error: " . $stmt->errorInfo()[2];
+        $error = "Failed to register. Please try again.";
     }
 }
 ?>
-
-<form method="POST" action="">
-    <input type="text" name="name" placeholder="Full Name" required>
-    <input type="email" name="email" placeholder="Email" required>
-    <input type="password" name="password" placeholder="Password" required>
-    <button type="submit">Register</button>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Register</title>
+</head>
+<body>
+<div class="container mt-5">
+    <h1>Register</h1>
+    <?php if (isset($error)): ?>
+        <div class="alert alert-danger"><?php echo $error; ?></div>
+    <?php endif; ?>
+    <form method="POST">
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" name="name" id="name" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" name="email" id="email" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" name="password" id="password" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Register</button>
+        <a href="login.php" class="btn btn-secondary">Login</a>
+    </form>
+</div>
+</body>
+</html>
