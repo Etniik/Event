@@ -1,4 +1,5 @@
 <?php
+session_start();
 include 'db_connection.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -6,17 +7,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $_POST['email'];
     $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
 
-    $sql = "INSERT INTO users (name, email, password) VALUES (:name, :email, :password)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':name', $name);
-    $stmt->bindParam(':email', $email);
-    $stmt->bindParam(':password', $password);
+    try {
+        // Check if the email already exists
+        $checkSql = "SELECT id FROM users WHERE email = :email";
+        $checkStmt = $conn->prepare($checkSql);
+        $checkStmt->bindParam(':email', $email, PDO::PARAM_STR);
+        $checkStmt->execute();
 
-    if ($stmt->execute()) {
-        header("Location: login.php");
-        exit();
-    } else {
-        $error = "Failed to register. Please try again.";
+        if ($checkStmt->rowCount() > 0) {
+            // Email already exists
+            echo "<script>alert('This email is already registered. Please log in or use a different email.');</script>";
+        } else {
+            // Insert new user
+            $sql = "INSERT INTO users (name, email, password) VALUES (:name, :email, :password)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':name', $name, PDO::PARAM_STR);
+            $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+            $stmt->bindParam(':password', $password, PDO::PARAM_STR);
+
+            if ($stmt->execute()) {
+                echo "<script>alert('Registration successful! Please log in.'); window.location.href='login.php';</script>";
+            } else {
+                echo "<script>alert('Registration failed. Please try again.');</script>";
+            }
+        }
+    } catch (PDOException $e) {
+        echo "Error: " . $e->getMessage();
     }
 }
 ?>
@@ -31,24 +47,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body>
 <div class="container mt-5">
     <h1>Register</h1>
-    <?php if (isset($error)): ?>
-        <div class="alert alert-danger"><?php echo $error; ?></div>
-    <?php endif; ?>
-    <form method="POST">
+    <form action="register.php" method="POST">
         <div class="mb-3">
             <label for="name" class="form-label">Name</label>
-            <input type="text" name="name" id="name" class="form-control" required>
+            <input type="text" class="form-control" id="name" name="name" required>
         </div>
         <div class="mb-3">
             <label for="email" class="form-label">Email</label>
-            <input type="email" name="email" id="email" class="form-control" required>
+            <input type="email" class="form-control" id="email" name="email" required>
         </div>
         <div class="mb-3">
             <label for="password" class="form-label">Password</label>
-            <input type="password" name="password" id="password" class="form-control" required>
+            <input type="password" class="form-control" id="password" name="password" required>
         </div>
         <button type="submit" class="btn btn-primary">Register</button>
-        <a href="login.php" class="btn btn-secondary">Login</a>
     </form>
 </div>
 </body>
