@@ -43,10 +43,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>Register</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .card {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+    </style>
 </head>
 <body>
-<div class="container mt-5">
-    <h1>Register</h1>
+<div class="card">
+    <h1 class="text-center">Register</h1>
     <form action="register.php" method="POST">
         <div class="mb-3">
             <label for="name" class="form-label">Name</label>
@@ -60,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <label for="password" class="form-label">Password</label>
             <input type="password" class="form-control" id="password" name="password" required>
         </div>
-        <button type="submit" class="btn btn-primary">Register</button>
+        <button type="submit" class="btn btn-primary w-100">Register</button>
     </form>
 </div>
 </body>
