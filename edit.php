@@ -3,7 +3,6 @@ session_start();
 include 'db_connection.php';
 include 'navbar.php';
 
-
 // Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -27,7 +26,7 @@ $stmt->execute();
 $event = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$event) {
-    echo "Event not found or you do not have permission to edit this event.";
+    header("Location: events.php?error=not_authorized_edit");
     exit();
 }
 

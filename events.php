@@ -33,6 +33,12 @@ $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     <?php endif; ?>
 
+    <?php if (isset($_GET['error']) && $_GET['error'] == 'not_authorized_edit'): ?>
+        <div class="alert alert-danger">
+            You are not authorized to edit this event.
+        </div>
+    <?php endif; ?>
+
     <?php if (isset($_GET['error']) && $_GET['error'] == 'not_authorized'): ?>
         <div class="alert alert-danger">
             You are not authorized to delete this event.
