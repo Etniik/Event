@@ -49,7 +49,6 @@ $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <table class="table table-bordered">
         <thead>
         <tr>
-            <th>#</th>
             <th>Event Name</th>
             <th>Date</th>
             <th>Location</th>
@@ -60,7 +59,6 @@ $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <tbody>
         <?php foreach ($events as $event): ?>
             <tr>
-                <td><?php echo htmlspecialchars($event['id']); ?></td>
                 <td><?php echo htmlspecialchars($event['name']); ?></td>
                 <td><?php echo htmlspecialchars($event['date']); ?></td>
                 <td><?php echo htmlspecialchars($event['location']); ?></td>
